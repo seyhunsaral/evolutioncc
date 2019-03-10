@@ -1,0 +1,117 @@
+# The function is written in a generalizable manner in terms of number of actions
+library(here)
+
+# These are special variables which the functions take input from
+num_actions  <<- 3
+efficiency_rate  <<- 2
+delta  <- 0.8
+
+num_agents  <- 1000
+types  <- get_type_names(num_actions)
+num_types  <- length(types)
+
+source('./functions.R')
+
+
+# Creating population
+
+agents  <- generate_agents(num_agents = num_agents, all_types = types)
+
+print(agents)
+round  <- 1
+
+matchings  <- create_matching(1000)
+
+current_matching  <- matchings[1,]
+
+first_mover  <- current_matching[1]
+second_mover  <- current_matching[2]
+
+type_first_mover  <- agents[first_mover, "type"]
+type_second_mover  <- agents[second_mover, "type"]
+
+type_first_mover  <- 80
+type_second_mover  <- 0
+
+num_interactions  <- draw_num_interactions(delta)                       
+
+
+### I STARTED THIS PART THAT IT WAS SOLVED IN A MORE ELEGANT WAY IN THE PREVIOUS CODE
+### THAT WILL PROBABLY GO
+## # initial reaction 
+## reaction_second  <- -1
+
+## # for (i in 1:num_interactions) {
+## interaction  <- 1
+
+## reaction_first  <- react(type = type_first_mover, opponent_action = reaction_second)
+## print(reaction_first)
+## payoffs_round  <- get_payoffs(reaction_first)
+## print(payoffs_first_move)
+## agents[first_mover, "payoff"]  <- agents[first_mover, "payoff"] + payoffs_round[1]
+## agents[second_mover, "payoff"]  <- agents[second_mover, "payoff"] + payoffs_round[2]
+## agents[first_mover,]
+## agents[second_mover,]
+
+
+## reaction_second  <- react(type = type_second_mover, opponent_action = reaction_first)
+## print(reaction_second)
+## payoffs_round  <- get_payoffs(reaction_second)
+## print(payoffs_second_move)
+## agents[first_mover, "payoff"]  <- agents[first_mover, "payoff"] + payoffs_round[2]
+## agents[second_mover, "payoff"]  <- agents[second_mover, "payoff"] + payoffs_round[1]
+
+## agents[first_mover,]
+## agents[second_mover,]
+
+
+## #}
+
+
+
+
+
+
+
+# HERE IS THE ADAPTATION OF THE LEGACY CODE
+ 
+    
+ #   for (CurrMatchLine in 1:(NumAgents/2)) {
+
+current_matching_line  <- 1
+
+      current_matching <-matchings[current_matching_line,]
+      #Setting The Initial Reaction
+      previous_action<--1
+      # Random Selection of the first mover
+      mover<- sample(current_matching,1)
+      receiver  <- current_matching[current_matching!=mover]
+      #for (i in 1:number_of_interactions) { 
+        # Action of The Current Player
+        action <- react(agents[mover,1],opponent_action = previous_action)
+        #Recording the moves
+  #TODO MCMoveFreq[Move+1,Gen]=MCMoveFreq[Move+1,Gen]+1
+        
+        #Assigning Payoffs
+        current_payoffs<-get_payoffs(action)
+        #Movers Payoff
+        agents[mover, "payoff"]  <- agents[mover, "payoff"] + current_payoffs[1]
+
+        #Counterparts Payoff
+        agents[receiver,"payoff"] <- agents[receiver,"payoff"] + current_payoffs[2]
+          
+        #Switches the Mover here
+        mover<- receiver
+        receiver  <- current_matching[current_matching!=mover]
+        previous_action <- action
+
+      agents[current_matching,]
+
+
+# TODO : WHICH VARS TO RECORD
+# TODO : WHAT TYPE OF DATA STRUCTURE
+# TODO : ITERATION OVER INTERACTIONS
+# TODO : ITERATION OVER MATCHINGS
+# TODO : ITERATION OVER GENERATIONS
+      #}
+
