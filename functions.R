@@ -1,6 +1,6 @@
 # ==== Reaction Function ====
 
-# The function is written in a generalizeable manners in terms of number of actions
+# The function is written in a generalizable manner in terms of number of actions
 num_actions  <- 3
 efficiency_rate  <- 2
 
@@ -82,13 +82,47 @@ get_payoffs <- function(first_player_action) {
     }
 
 
-create_agents  <- function(num_agents, all_types, type_generation = "uniform") {
-    if (type_generation == "uniform"){
-     type  <-  sample(all_types, size=num_agents, replace = TRUE)   
-    }
+ mutate_from_vector  <- function(mutators, mutants, mutation_prob) {
+     # Mutators get mutated from mutant vector according to the probablility
+     # This is a computation efficient way to handle mutations
+     mutator_size  <- length(mutators)
+     if(mutator_size != length(mutants)) {
+         stop("Mutator and mutant vectors should have the same length")
+         }
+     mutation_happens  <- runif(mutator_size) < mutation_prob
+     mutators[mutation_happens]  <- mutants[mutation_happens]
+     return(mutators)
+ }
+
+
+       
+generate_agents  <- function(num_agents, all_types, agent_table = NULL, method = "uniform", mutation_prob = 0) {
+    if (length(all_types) == 1) { stop("We need more than one types")} 
+    if (is.null(agent_table)) {
+        # Initial generation
+        if (method == "uniform"){
+            type  <-  sample(all_types,
+                             size=num_agents,
+                             replace = TRUE
+                             )   
+        }        
+        }
+    else {
+            if (method == "uniform") {
+                agent_table_size  <- dim(agent_table)
+                agents_no_mutation  <- sample(agent_table[,1], 
+                                              size = num_agents, # Here we gave a little flexibility to changing population size
+                                              prob = agent_table[,2]/sum(agent_table[,2]),
+                                              replace = TRUE
+                                              )
+                agents_all_mutation  <- sample(all_types, size = num_agents, replace = TRUE)
+                type  <- mutate_from_vector(agents_no_mutation, agents_all_mutation, mutation_prob)
+            }
+        }
     payoff  <- rep(0, times=num_agents)
-    return(cbind(type, payoff))
+    return(cbind(type, payoff)) 
            }
+ 
 
 create_matching<-function(num_agents, method = "random") {
     if(method == "random"){
@@ -97,8 +131,3 @@ create_matching<-function(num_agents, method = "random") {
     }
 return(matching_matrix)
 }
-
-       
- 
-
-
