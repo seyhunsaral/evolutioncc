@@ -17,9 +17,9 @@ possible_types  <- expand.grid(rep(possible_actions, domain_size))
 possible_types  <- possible_types[,domain_size:1]  # trick to sort in a numeric way
 
 number_of_types<-dim(possible_types)[1]
-
+type_names  <- 0:(number_of_types-1)
 colnames(possible_types) <- seq(-1,num_actions-1)
-rownames(possible_types) <-0:(number_of_types-1)
+rownames(possible_types) <- type_names
 
 possible_types<-as.matrix(possible_types)
 
@@ -80,7 +80,24 @@ get_payoffs <- function(first_player_action) {
 
     return(c(first_player_payoff, second_player_payoff))
     }
-    
+
+
+create_agents  <- function(num_agents, all_types, type_generation = "uniform") {
+    if (type_generation == "uniform"){
+     type  <-  sample(all_types, size=num_agents, replace = TRUE)   
+    }
+    payoff  <- rep(0, times=num_agents)
+    return(cbind(type, payoff))
+           }
+
+create_matching<-function(num_agents, method = "random") {
+    if(method == "random"){
+      agents_shuffled  <- sample(1:num_agents)
+      matching_matrix  <- cbind(agents_shuffled[1:(num_agents/2)],agents_shuffled[((num_agents/2)+1):num_agents])
+    }
+return(matching_matrix)
+}
+
        
  
 
