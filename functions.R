@@ -90,8 +90,9 @@ get_payoffs <- function(action) {
        
     first_player_payoff  <- 1 - (action /(num_actions-1))
     second_player_payoff  <- efficiency_rate * (action/(num_actions-1))
-
-    return(c(first_player_payoff, second_player_payoff))
+    payoffs <- c(first_player_payoff, second_player_payoff)
+    names(payoffs)  <- c("mover", "receiver")
+    return(payoffs)
     }
 
 
@@ -132,8 +133,9 @@ generate_agents  <- function(num_agents, all_types, agent_table = NULL, method =
                 type  <- mutate_from_vector(agents_no_mutation, agents_all_mutation, mutation_prob)
             }
         }
+    agent_no  <- 1:num_agents 
     payoff  <- rep(0, times=num_agents)
-    return(cbind(type, payoff)) 
+    return(cbind(agent_no, type, payoff)) 
            }
  
 
