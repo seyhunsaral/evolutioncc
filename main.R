@@ -21,37 +21,43 @@ matchings  <- create_matching(1000)
 round  <- 1
 
 current_matching_line  <- 1
+current_matching <-matchings[current_matching_line,]
 
-      current_matching <-matchings[current_matching_line,]
-      #Setting The Initial Reaction
-      previous_action<--1
-      # Random Selection of the first mover
+#Setting The Initial Reaction
+previous_action<--1
+
+num_interactions  <- draw_num_interactions(delta)
+
+num_interactions  <- 10 # THIS IS TEMPORARY
+
+for (intr in 1:num_interactions) {  
+      # random selection of the first mover
       mover<- sample(current_matching,1)
       receiver  <- current_matching[current_matching!=mover]
       #for (i in 1:number_of_interactions) { 
-        # Action of The Current Player
+        # action of the current player
         action <- react(agents[mover,"type"],opponent_action = previous_action)
-        #Recording the moves
-  #TODO MCMoveFreq[Move+1,Gen]=MCMoveFreq[Move+1,Gen]+1
-        
-        #Assigning Payoffs
+        #recording the moves
+  #todo mcmovefreq[move+1,gen]=mcmovefreq[move+1,gen]+1
+        #assigning payoffs
         current_payoffs<-get_payoffs(action)
-        #Movers Payoff
+        #movers payoff
         agents[mover, "payoff"]  <- agents[mover, "payoff"] + current_payoffs["mover"]
-
-        #Counterparts Payoff
+        #counterparts payoff
         agents[receiver,"payoff"] <- agents[receiver,"payoff"] + current_payoffs["receiver"]
-          
-        
-        #Some verbose summary
+        #some verbose summary
+        print(intr)
         print(paste0("mover: ", as.character(mover),"(",as.character(agents[mover,"type"]), ") | receiver: ", as.character(receiver),"(",as.character(agents[receiver,"type"]), ")"))
         print(paste0("mover plays ", as.character(action)))
-        agents[current_matching,]
-
+        print(agents[current_matching,])
         #Switches the Mover here
         mover<- receiver
         receiver  <- current_matching[current_matching!=mover]
         previous_action <- action
+}
+
+
+
 
 # TODO : WHICH VARS TO RECORD
 # TODO : WHAT TYPE OF DATA STRUCTURE

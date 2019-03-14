@@ -22,7 +22,7 @@ return(0:(number_of_actions^(number_of_actions+1)-1))
     }
 
 draw_num_interactions  <-  function(delta) {
-    if(delta <=0) { stop('hey... this may take forever')}
+    if(delta <=0) { stop('whoa... you know this may take forever')}
     return(rgeom(1, 1-delta) + 1)   
     }
 
