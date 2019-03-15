@@ -11,24 +11,40 @@ delta  <- 0.8
 
 # number of agents should be even
 num_agents  <- 1000
-types  <- get_type_names(num_actions)
+types  <- get_type_names()
 num_types  <- length(types)
 
+
+
+
 # Creating population
-agents  <- generate_agents(num_agents = num_agents, all_types = types)
+
+agents = NULL # First generation
+
+for (generation in 1:300) {
+
+agents  <- generate_agents(num_agents = num_agents, all_types = types, agent_table = agents)
 matchings  <- create_matching(1000)
-# print(agents)
-round  <- 1
+num_matchings  <- dim(matchings)[1]
+# Tables
 
-current_matching_line  <- 1
+
+
+# Recording history
+
+action_prop_generation <- rep(0,num_actions) 
+
+for (current_matching_line in 1:num_matchings) {
 current_matching <-matchings[current_matching_line,]
-
-#Setting The Initial Reaction
-previous_action<--1
-
 num_interactions  <- draw_num_interactions(delta)
 
-num_interactions  <- 10 # THIS IS TEMPORARY
+# reset action frequencies
+action_frequencies  <- rep(0,num_actions)
+
+
+#Setting The Initial Reaction
+
+previous_action<--1
 
 for (intr in 1:num_interactions) {  
       # random selection of the first mover
@@ -37,24 +53,56 @@ for (intr in 1:num_interactions) {
       #for (i in 1:number_of_interactions) { 
         # action of the current player
         action <- react(agents[mover,"type"],opponent_action = previous_action)
+  
+        action_frequencies[action+1]  <- action_frequencies[action+1] + 1 # +1 is the usual 0,1,2
+ 
         #recording the moves
   #todo mcmovefreq[move+1,gen]=mcmovefreq[move+1,gen]+1
         #assigning payoffs
-        current_payoffs<-get_payoffs(action)
+
+  current_payoffs<-get_payoffs(action)
         #movers payoff
-        agents[mover, "payoff"]  <- agents[mover, "payoff"] + current_payoffs["mover"]
+
+  agents[mover, "payoff"]  <- agents[mover, "payoff"] + current_payoffs["mover"]
         #counterparts payoff
         agents[receiver,"payoff"] <- agents[receiver,"payoff"] + current_payoffs["receiver"]
-        #some verbose summary
-        print(intr)
-        print(paste0("mover: ", as.character(mover),"(",as.character(agents[mover,"type"]), ") | receiver: ", as.character(receiver),"(",as.character(agents[receiver,"type"]), ")"))
-        print(paste0("mover plays ", as.character(action)))
-        print(agents[current_matching,])
-        #Switches the Mover here
+
+  
+#some verbose summary
+#        print(intr)
+#        print(paste0("mover: ", as.character(mover),"(",as.character(agents[mover,"type"]), ") | receiver: ", as.character(receiver),"(",as.character(agents[receiver,"type"]), ")"))
+#        print(paste0("mover plays ", as.character(action)))
+#        print(agents[current_matching,])
+
+  #Switches the Mover here
         mover<- receiver
         receiver  <- current_matching[current_matching!=mover]
         previous_action <- action
+
+
 }
+
+# Action frequencies stands for each 
+action_prop_generation  <- action_prop_generation + action_frequencies/(num_interactions * num_matchings)
+}
+print(c(generation, action_prop_generation))
+print(head(agents[order(agents[,"payoff"], decreasing = TRUE),]))
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#Write to table
+#write.csv(c(delta, efficiency_rate, action, rate), row.names = FALSE, append = TRUE)
 
 
 

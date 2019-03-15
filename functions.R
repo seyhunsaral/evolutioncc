@@ -4,11 +4,15 @@ domain_size  <- num_actions + 1 # +1 is the first move
 ## L=0, M=1, H=2
 possible_actions  <- list(0:(num_actions-1))
 
+get_actions  <- function() {return(possible_actions)} 
 ## First column refers to the first move, the rest are conditional responses
 ## In case three possible actions the rest are reactions to L,M, and H respectively
 # The last part belove is to sort 
 possible_types  <- expand.grid(rep(possible_actions, domain_size))
 possible_types  <- possible_types[,domain_size:1]  # trick to sort in a numeric way
+
+get_type_strategies  <- function() {return(possible_types)}
+
 
 number_of_types<-dim(possible_types)[1]
 type_names  <- 0:(number_of_types-1)
@@ -17,8 +21,8 @@ rownames(possible_types) <- type_names
 
 possible_types<-as.matrix(possible_types)
 
-get_type_names  <- function(number_of_actions) {
-return(0:(number_of_actions^(number_of_actions+1)-1))
+get_type_names  <- function() {
+return(0:(num_actions^(num_actions+1)-1))
     }
 
 draw_num_interactions  <-  function(delta) {
@@ -124,9 +128,9 @@ generate_agents  <- function(num_agents, all_types, agent_table = NULL, method =
     else {
             if (method == "uniform") {
                 agent_table_size  <- dim(agent_table)
-                agents_no_mutation  <- sample(agent_table[,1], 
+                agents_no_mutation  <- sample(x = agent_table[,"type"], 
                                               size = num_agents, # Here we gave a little flexibility to changing population size
-                                              prob = agent_table[,2]/sum(agent_table[,2]),
+                                              prob = agent_table[,"payoff"]/sum(agent_table[,"payoff"]),
                                               replace = TRUE
                                               )
                 agents_all_mutation  <- sample(all_types, size = num_agents, replace = TRUE)
