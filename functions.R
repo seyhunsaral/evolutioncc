@@ -30,7 +30,7 @@ draw_num_interactions  <-  function(delta) {
     return(rgeom(1, 1-delta) + 1)   
     }
 
-react<-function(type, opponent_action, error_rate)  {
+react<-function(type, opponent_action, mistake_rate)  {
     # Reaction function:
     #    takes type no and opponent action as input and reacts according to type
     #    possible to add noise
@@ -40,12 +40,12 @@ react<-function(type, opponent_action, error_rate)  {
     # finds the reaction according to the name of columns, not the intex
     reaction_deterministic  <- possible_types[as.character(type),as.character(opponent_action)]
     
-    if (missing(error_rate)) {
+    if (missing(mistake_rate)) {
     return(reaction_deterministic)
   }
   else
   {
-     if (error_rate>runif(1)) {
+     if (mistake_rate>runif(1)) {
       return(sample(possible_actions,1))
     }
     else
@@ -87,7 +87,7 @@ react<-function(type, opponent_action, error_rate)  {
 # c and ie is normalized to 1
 # therefore b is also b/c
 
-get_payoffs <- function(action) {
+get_payoffs <- function(action, efficiency_rate) {
     if (action > (num_actions-1)) {
         stop('Action outside of defined range')
     }
