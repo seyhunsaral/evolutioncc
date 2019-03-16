@@ -2,13 +2,13 @@
 domain_size  <- num_actions + 1 # +1 is the first move
 
 ## L=0, M=1, H=2
-possible_actions  <- list(0:(num_actions-1))
-
-get_actions  <- function() {return(possible_actions)} 
+possible_actions_list  <- list(0:(num_actions-1))
+get_actions  <- function() {return(possible_actions_list[[1]])}
+possible_actions  <- get_actions()
 ## First column refers to the first move, the rest are conditional responses
 ## In case three possible actions the rest are reactions to L,M, and H respectively
 # The last part belove is to sort 
-possible_types  <- expand.grid(rep(possible_actions, domain_size))
+possible_types  <- expand.grid(rep(possible_actions_list, domain_size))
 possible_types  <- possible_types[,domain_size:1]  # trick to sort in a numeric way
 
 get_type_strategies  <- function() {return(possible_types)}
@@ -46,7 +46,7 @@ react<-function(type, opponent_action, error_rate)  {
   else
   {
      if (error_rate>runif(1)) {
-      return(round(runif(n=1,min=0,max=num_actions-1)))
+      return(sample(possible_actions,1))
     }
     else
       return(reaction_deterministic)
