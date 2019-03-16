@@ -150,3 +150,14 @@ create_matching<-function(num_agents, method = "random") {
     }
 return(matching_matrix)
 }
+
+
+# -----------------------------------------------------------------------------------------
+#                             Graphics Functions
+# -----------------------------------------------------------------------------------------
+
+get_type_strategy  <- function(typeno) {
+  strategy  <- possible_types[as.character(typeno),]
+  names(strategy)  <- NULL
+  return(strategy)
+    }
