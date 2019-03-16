@@ -1,22 +1,39 @@
+
+# DONE : WHICH VARS TO RECORD - Actions over Simulation, Generation with parameters
+# DONE : WHAT TYPE OF DATA STRUCTURE - Tidy Data
+# DONE : ITERATION OVER INTERACTIONS 
+# DONE : ITERATION OVER MATCHINGS
+# DONE : ITERATION OVER GENERATIONS
+# TODO : ITERATION OVER SIMULATIONS
+
 # The function is written in a generalizable manner in terms of number of actions
 library(here)
 options(scipen=999)
 setwd(here::here())
+set.seed(05091946)
 
-# These are special variables which the functions take input from
+# Number of possible actions. This is to generalize nth-level linear prisoners dilemma
+# Please note that the complexity drastically increases as the num_actions increase
+# As I wanted the simulation to be easily generalizable, most of the functions depend on this value
+# Therefore it needs to be assigned globally (with super-assignment operator <<) before the load of `functions.R`
 num_actions  <<- 3
-efficiency_rate  <<- 2
-source('./functions.R')
 
-delta  <- 0.4
+
+source('./functions.R')
+efficiency_rate  <- 2
+delta  <- 0.90
 
 # number of agents should be even
-num_agents  <- 1000
-error_rate  <- 1
+num_agents  <- 500
+mistake_rate  <- 0.005
 mutation_rate  <- 0.01
+num_generations  <- 500000
+
 types  <- get_type_names()
 num_types  <- length(types)
-num_generations  <- 1000
+
+
+
 plot(0,0,xlim=range(0:num_generations), ylim = range(0:1))
 
 
@@ -28,17 +45,14 @@ agents = NULL # First generation
 # Creating tables
 simulation  <- 1
 
-tbl_actions_header  <- matrix(c("delta", "efficiency_rate", "simulation", "generation", "action", "proportion"),nrow = 1)
+tbl_actions_header  <- matrix(c("delta", "efficiency_rate", "mistake_rate", "mutation_rate", "num_agents", "simulation", "generation", "action", "proportion"),nrow = 1)
 write.table(tbl_actions_header, "db_actions.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
-
-
-
 
 
 for (generation in 1:num_generations) {
 
 agents  <- generate_agents(num_agents = num_agents, all_types = types, agent_table = agents, mutation_prob = mutation_rate)
-matchings  <- create_matching(1000)
+matchings  <- create_matching(num_agents)
 num_matchings  <- dim(matchings)[1]
 # Tables
 
@@ -66,7 +80,7 @@ for (intr in 1:num_interactions) {
       receiver  <- current_matching[current_matching!=mover]
       #for (i in 1:number_of_interactions) { 
         # action of the current player
-        action <- react(agents[mover,"type"],opponent_action = previous_action, error_rate = error_rate)
+        action <- react(agents[mover,"type"],opponent_action = previous_action, mistake_rate = mistake_rate)
   
         action_frequencies[action+1]  <- action_frequencies[action+1] + 1 # +1 is the usual 0,1,2
  
@@ -74,7 +88,7 @@ for (intr in 1:num_interactions) {
   #todo mcmovefreq[move+1,gen]=mcmovefreq[move+1,gen]+1
         #assigning payoffs
 
-  current_payoffs<-get_payoffs(action)
+  current_payoffs<-get_payoffs(action, efficiency_rate)
         #movers payoff
 
   agents[mover, "payoff"]  <- agents[mover, "payoff"] + current_payoffs["mover"]
@@ -106,10 +120,13 @@ action_prop_generation  <- action_prop_generation + action_frequencies/(num_inte
   points(generation, action_prop_generation[2],col = "yellow", cex = 0.4)
   points(generation, action_prop_generation[3],col = "green", cex = 0.4)
 
-for (act in 1:num_actions){
-tbl_actions_current_line  <- matrix(c(delta, efficiency_rate, simulation, generation, act-1, action_prop_generation[act]),nrow = 1)
 
-write.table(tbl_actions_current_line, "db_actions.csv", append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+
+    
+for (act in 1:num_actions){
+    tbl_actions_current_line  <- matrix(c(delta, efficiency_rate, mistake_rate, mutation_rate, num_agents, simulation, generation, act-1, action_prop_generation[act]),nrow = 1)
+
+    write.table(tbl_actions_current_line, "db_actions.csv", append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
 
 
 
@@ -120,78 +137,3 @@ write.table(tbl_actions_current_line, "db_actions.csv", append = TRUE, row.names
 
 
 
-
-
-
-
-
-
-
-
-
-#Write to table
-#write.csv(c(delta, efficiency_rate, action, rate), row.names = FALSE, append = TRUE)
-
-
-
-
-# TODO : WHICH VARS TO RECORD
-# TODO : WHAT TYPE OF DATA STRUCTURE
-# TODO : ITERATION OVER INTERACTIONS
-# TODO : ITERATION OVER MATCHINGS
-# TODO : ITERATION OVER GENERATIONS
-      #}
-
-
-
-
-
-### I STARTED THIS PART THAT IT WAS SOLVED IN A MORE ELEGANT WAY IN THE PREVIOUS CODE
-## 
-
-## current_matching  <- matchings[1,]
-
-## first_mover  <- current_matching[1]
-## second_mover  <- current_matching[2]
-
-## type_first_mover  <- agents[first_mover, "type"]
-## type_second_mover  <- agents[second_mover, "type"]
-
-## type_first_mover  <- 80
-## type_second_mover  <- 0
-
-## num_interactions  <- draw_num_interactions(delta)                       
-
-### THAT WILL PROBABLY GO
-## # initial reaction 
-## reaction_second  <- -1
-
-## # for (i in 1:num_interactions) {
-## interaction  <- 1
-
-## reaction_first  <- react(type = type_first_mover, opponent_action = reaction_second)
-## print(reaction_first)
-## payoffs_round  <- get_payoffs(reaction_first)
-## print(payoffs_first_move)
-## agents[first_mover, "payoff"]  <- agents[first_mover, "payoff"] + payoffs_round[1]
-## agents[second_mover, "payoff"]  <- agents[second_mover, "payoff"] + payoffs_round[2]
-## agents[first_mover,]
-## agents[second_mover,]
-
-
-## reaction_second  <- react(type = type_second_mover, opponent_action = reaction_first)
-## print(reaction_second)
-## payoffs_round  <- get_payoffs(reaction_second)
-## print(payoffs_second_move)
-## agents[first_mover, "payoff"]  <- agents[first_mover, "payoff"] + payoffs_round[2]
-## agents[second_mover, "payoff"]  <- agents[second_mover, "payoff"] + payoffs_round[1]
-
-## agents[first_mover,]
-## agents[second_mover,]
-
-
-## #}
-
-# HERE IS THE ADAPTATION OF THE LEGACY CODE
-     
- #   for (CurrMatchLine in 1:(NumAgents/2)) {
