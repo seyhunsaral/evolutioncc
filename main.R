@@ -23,8 +23,8 @@ initiate_output_files()
 num_agents  <- 200
 mistake_rate  <- 0.005
 mutation_rate  <- 0.01
-num_generations  <- 100
-num_simulations  <- 2
+num_generations  <- 50000
+num_simulations  <- 300
 efficiency_rate  <- 3
 
 
@@ -48,7 +48,7 @@ for (simulation in 1:num_simulations) {
   }
   else {
     time_elapsed  <-  proc.time()[3] - first_time_measure[3]
-    simulation_left  <- num_simulations - simulation - 1
+    simulation_left  <- num_simulations - simulation + 1
     average_time_per_simulation  <-  time_elapsed / (simulation - 1) 
     expected_remaining_time  <- ceiling((simulation_left * average_time_per_simulation)/60)
     message('      expected remaining time:', expected_remaining_time, ' mins')
