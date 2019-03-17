@@ -26,11 +26,14 @@ return(0:(num_actions^(num_actions+1)-1))
     }
 
 draw_num_interactions  <-  function(delta) {
-    if(delta <=0) { stop('whoa... you know this may take forever')}
+    if(delta <=0 | delta >=1 ) { stop('wrong delta range')}
     return(rgeom(1, 1-delta) + 1)   
     }
 
 react<-function(type, opponent_action, mistake_rate)  {
+    if (mistake_rate < 0 | mistake_rate > 1) {
+        stop("mistake rate should be between 0 and 1")
+        }
     # Reaction function:
     #    takes type no and opponent action as input and reacts according to type
     #    possible to add noise
@@ -40,7 +43,7 @@ react<-function(type, opponent_action, mistake_rate)  {
     # finds the reaction according to the name of columns, not the intex
     reaction_deterministic  <- possible_types[as.character(type),as.character(opponent_action)]
     
-    if (missing(mistake_rate)) {
+    if (missing(mistake_rate) | mistake_rate == 0) {
     return(reaction_deterministic)
   }
   else
@@ -52,6 +55,42 @@ react<-function(type, opponent_action, mistake_rate)  {
       return(reaction_deterministic)
       }
 }
+
+
+initiate_output_files  <- function() {
+tbl_actions_header  <- matrix(c("delta",
+                                "efficiency_rate",
+                                "mistake_rate",
+                                "mutation_rate",
+                                "num_agents",
+                                "simulation",
+                                "generation",
+                                "action",
+                                "proportion"
+                                )
+                             ,nrow = 1)
+
+
+write.table(tbl_actions_header, "./data/db_actions.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+
+tbl_types_header  <- matrix(c("delta",
+                              "efficiency_rate",
+                              "mistake_rate",
+                              "mutation_rate",
+                              "num_agents",
+                              "simulation",
+                              "generation",
+                              "type",
+                              "proportion"
+                              )
+                           ,nrow = 1)
+
+
+write.table(tbl_types_header, "./data/db_types.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+
+message("initiated output files")
+
+    }
 
 # ==== ==== ====
 

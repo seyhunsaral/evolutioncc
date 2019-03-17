@@ -1,10 +1,4 @@
 
-# DONE : WHICH VARS TO RECORD - Actions over Simulation, Generation with parameters
-# DONE : WHAT TYPE OF DATA STRUCTURE - Tidy Data
-# DONE : ITERATION OVER INTERACTIONS 
-# DONE : ITERATION OVER MATCHINGS
-# DONE : ITERATION OVER GENERATIONS
-# TODO : ITERATION OVER SIMULATIONS
 
 library(here)
 options(scipen=999)
@@ -19,58 +13,49 @@ num_actions  <<- 3
 
 
 source('./functions.R')
-efficiency_rate  <- 2
-delta  <- 0.80
-
-# number of agents should be even
-num_agents  <- 500
-mistake_rate  <- 0.01
-mutation_rate  <- 0.01
-num_generations  <- 150000
-
 types  <- get_type_names()
 actions  <- get_actions()
 num_types  <- length(types)
 
+initiate_output_files()
+
+num_agents  <- 200
+mistake_rate  <- 0.005
+mutation_rate  <- 0.01
+num_generations  <- 500
+num_simulations  <- 300
 
 
-plot(NA,NA,xlim=range(0:num_generations), ylim = range(0:1))
+efficiency_rate  <- 3
+#delta  <- 0.95
+
+
+delta_range  <- c(0.25, 0.33, 0.50, 0.66, 0.75, 0.85, 0.90, 0.95)
+# number of agents should be even
+
+
+
+# ENABLE PLOT HERE AND AT THE BOTTOM
+
 
 
 
 
 
 # Creating tables
-tbl_actions_header  <- matrix(c("delta",
-                                "efficiency_rate",
-                                "mistake_rate",
-                                "mutation_rate",
-                                "num_agents",
-                                "simulation",
-                                "generation",
-                                "action",
-                                "proportion"
-                                )
-                             ,nrow = 1)
 
 
-write.table(tbl_actions_header, "db_actions.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+#simulation  <- 1
 
-tbl_types_header  <- matrix(c("delta",
-                              "efficiency_rate",
-                              "mistake_rate",
-                              "mutation_rate",
-                              "num_agents",
-                              "simulation",
-                              "generation",
-                              "type",
-                              "proportion"
-                              )
-                           ,nrow = 1)
+for (simulation in 1:num_simulations) {
+message('Simulation no:',simulation, ' out of '. num_simulations)
+total_elapsed_time  <- 0
+#for (delta in delta_range ) {
+for (delta in c(0.75)) {
 
 
-write.table(tbl_types_header, "db_types.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
-
+time  <- proc.time()
+plot(NA,NA,xlim=range(0:num_generations), ylim = range(0:1))
 
 agents = NULL # NULL indicates the generation function that it is the first generation 
 for (generation in 1:num_generations) {
@@ -142,6 +127,8 @@ for (generation in 1:num_generations) {
   #print(c(generation, action_prop_generation))
   #print(head(agents[order(agents[,"payoff"], decreasing = TRUE),]))
 
+
+  # ENABLE PLOT HERE
   points(generation, action_prop_generation[1],col = "red", cex = 0.4)
   points(generation, action_prop_generation[2],col = "yellow", cex = 0.4)
   points(generation, action_prop_generation[3],col = "green", cex = 0.4)
@@ -174,5 +161,8 @@ for (generation in 1:num_generations) {
   
 }
 
-
-
+elapsed_time  <- proc.time()[3] - time[3]
+message('delta is ', delta, ' and elapsed time is ', elapsed_time )
+total_elapsed_time  <- total_elapsed_time + elapsed_time
+}
+}
