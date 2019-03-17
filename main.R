@@ -59,7 +59,8 @@ for (simulation in 1:num_simulations) {
 #    message('    -> current delta ', delta)
 
     time  <- proc.time()
-    plot(NA,NA,xlim=range(0:num_generations), ylim = range(0:1))
+    # Enable plot here
+    #    plot(NA,NA,xlim=range(0:num_generations), ylim = range(0:1))
 
     agents = NULL # NULL indicates the generation function that it is the first generation
 
@@ -138,9 +139,9 @@ for (simulation in 1:num_simulations) {
 
 
       # ENABLE PLOT HERE
-      points(generation, action_prop_generation[1],col = "red", cex = 0.4)
-      points(generation, action_prop_generation[2],col = "yellow", cex = 0.4)
-      points(generation, action_prop_generation[3],col = "green", cex = 0.4)
+      #points(generation, action_prop_generation[1],col = "red", cex = 0.4)
+      #points(generation, action_prop_generation[2],col = "yellow", cex = 0.4)
+      #points(generation, action_prop_generation[3],col = "green", cex = 0.4)
 
 
 
