@@ -23,8 +23,8 @@ initiate_output_files()
 num_agents  <- 200
 mistake_rate  <- 0.005
 mutation_rate  <- 0.01
-num_generations  <- 10000
-num_simulations  <- 300
+num_generations  <- 100
+num_simulations  <- 2
 efficiency_rate  <- 3
 
 
@@ -155,13 +155,13 @@ for (simulation in 1:num_simulations) {
       # Writing to data
       types_prop_generation <- table(factor(agents[,"type"], levels= types))
 
-      tbl_types_current_gen  <- data_frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, simulation = simulation, generation = generation, type = names(types_prop_generation), prop = as.numeric(types_prop_generation)/num_agents)
+      tbl_types_current_gen  <- data.frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, simulation = simulation, generation = generation, type = names(types_prop_generation), prop = as.numeric(types_prop_generation)/num_agents)
 
       write.table(tbl_types_current_gen, "./output/db_types.csv", append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
 
 
 
-      tbl_actions_current_gen  <- data_frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, simulation = simulation, generation = generation, action = actions, prop = action_prop_generation)
+      tbl_actions_current_gen  <- data.frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, simulation = simulation, generation = generation, action = actions, prop = action_prop_generation)
 
       write.table(tbl_actions_current_gen, "./output/db_actions.csv", append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
 
