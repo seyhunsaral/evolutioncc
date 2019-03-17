@@ -22,75 +22,76 @@ rownames(possible_types) <- type_names
 possible_types<-as.matrix(possible_types)
 
 get_type_names  <- function() {
-return(0:(num_actions^(num_actions+1)-1))
-    }
+  return(0:(num_actions^(num_actions+1)-1))
+}
 
 draw_num_interactions  <-  function(delta) {
-    if(delta <=0 | delta >=1 ) { stop('wrong delta range')}
-    return(rgeom(1, 1-delta) + 1)   
-    }
+  if(delta <=0 | delta >=1 ) { stop('wrong delta range')}
+  return(rgeom(1, 1-delta) + 1)   
+}
 
 react<-function(type, opponent_action, mistake_rate)  {
-    if (mistake_rate < 0 | mistake_rate > 1) {
-        stop("mistake rate should be between 0 and 1")
-        }
-    # Reaction function:
-    #    takes type no and opponent action as input and reacts according to type
-    #    possible to add noise
-    #    note that types start from 0 (type+1)
-    #
+  if (mistake_rate < 0 | mistake_rate > 1) {
+    stop("mistake rate should be between 0 and 1")
+  }
+  # Reaction function:
+  #    takes type no and opponent action as input and reacts according to type
+  #    possible to add noise
+  #    note that types start from 0 (type+1)
+  #
 
-    # finds the reaction according to the name of columns, not the intex
-    reaction_deterministic  <- possible_types[as.character(type),as.character(opponent_action)]
-    
-    if (missing(mistake_rate) | mistake_rate == 0) {
+  # finds the reaction according to the name of columns, not the intex
+  reaction_deterministic  <- possible_types[as.character(type),as.character(opponent_action)]
+  
+  if (missing(mistake_rate) | mistake_rate == 0) {
     return(reaction_deterministic)
   }
   else
   {
-     if (mistake_rate>runif(1)) {
+    if (mistake_rate>runif(1)) {
       return(sample(possible_actions,1))
     }
     else
       return(reaction_deterministic)
-      }
+  }
 }
 
 
 initiate_output_files  <- function() {
-tbl_actions_header  <- matrix(c("delta",
+  tbl_actions_header  <- matrix(c("delta",
+                                  "efficiency_rate",
+                                  "mistake_rate",
+                                  "mutation_rate",
+                                  "num_agents",
+                                  "simulation",
+                                  "generation",
+                                  "action",
+                                  "proportion"
+                                  )
+                               ,nrow = 1)
+
+
+  write.table(tbl_actions_header, "./output/db_actions.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+
+  tbl_types_header  <- matrix(c("delta",
                                 "efficiency_rate",
                                 "mistake_rate",
                                 "mutation_rate",
                                 "num_agents",
                                 "simulation",
                                 "generation",
-                                "action",
+                                "type",
                                 "proportion"
                                 )
                              ,nrow = 1)
 
 
-write.table(tbl_actions_header, "./data/db_actions.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+  write.table(tbl_types_header, "./output/db_types.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
 
-tbl_types_header  <- matrix(c("delta",
-                              "efficiency_rate",
-                              "mistake_rate",
-                              "mutation_rate",
-                              "num_agents",
-                              "simulation",
-                              "generation",
-                              "type",
-                              "proportion"
-                              )
-                           ,nrow = 1)
+  message("initiated output files")
 
+}
 
-write.table(tbl_types_header, "./data/db_types.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
-
-message("initiated output files")
-
-    }
 
 # ==== ==== ====
 
@@ -127,67 +128,67 @@ message("initiated output files")
 # therefore b is also b/c
 
 get_payoffs <- function(action, efficiency_rate) {
-    if (action > (num_actions-1)) {
-        stop('Action outside of defined range')
-    }
-       
-    first_player_payoff  <- 1 - (action /(num_actions-1))
-    second_player_payoff  <- efficiency_rate * (action/(num_actions-1))
-    payoffs <- c(first_player_payoff, second_player_payoff)
-    names(payoffs)  <- c("mover", "receiver")
-    return(payoffs)
-    }
+  if (action > (num_actions-1)) {
+    stop('Action outside of defined range')
+  }
+  
+  first_player_payoff  <- 1 - (action /(num_actions-1))
+  second_player_payoff  <- efficiency_rate * (action/(num_actions-1))
+  payoffs <- c(first_player_payoff, second_player_payoff)
+  names(payoffs)  <- c("mover", "receiver")
+  return(payoffs)
+}
 
 
- mutate_from_vector  <- function(mutators, mutants, mutation_prob) {
-     # Mutators get mutated from mutant vector according to the probablility
-     # This is a computation efficient way to handle mutations
-     mutator_size  <- length(mutators)
-     if(mutator_size != length(mutants)) {
-         stop("Mutator and mutant vectors should have the same length")
-         }
-     mutation_happens  <- runif(mutator_size) < mutation_prob
-     mutators[mutation_happens]  <- mutants[mutation_happens]
-     return(mutators)
- }
+mutate_from_vector  <- function(mutators, mutants, mutation_prob) {
+  # Mutators get mutated from mutant vector according to the probablility
+  # This is a computation efficient way to handle mutations
+  mutator_size  <- length(mutators)
+  if(mutator_size != length(mutants)) {
+    stop("Mutator and mutant vectors should have the same length")
+  }
+  mutation_happens  <- runif(mutator_size) < mutation_prob
+  mutators[mutation_happens]  <- mutants[mutation_happens]
+  return(mutators)
+}
 
 
-       
+
 generate_agents  <- function(num_agents, all_types, agent_table = NULL, method = "uniform", mutation_prob = 0) {
-    if (length(all_types) == 1) { stop("We need more than one types")} 
-    if (is.null(agent_table)) {
-        # Initial generation
-        if (method == "uniform"){
-            type  <-  sample(all_types,
-                             size=num_agents,
-                             replace = TRUE
-                             )   
-        }        
-        }
-    else {
-            if (method == "uniform") {
-                agent_table_size  <- dim(agent_table)
-                agents_no_mutation  <- sample(x = agent_table[,"type"], 
-                                              size = num_agents, # Here we gave a little flexibility to changing population size
-                                              prob = agent_table[,"payoff"]/sum(agent_table[,"payoff"]),
-                                              replace = TRUE
-                                              )
-                agents_all_mutation  <- sample(all_types, size = num_agents, replace = TRUE)
-                type  <- mutate_from_vector(agents_no_mutation, agents_all_mutation, mutation_prob)
-            }
-        }
-    agent_no  <- 1:num_agents 
-    payoff  <- rep(0, times=num_agents)
-    return(cbind(agent_no, type, payoff)) 
-           }
- 
+  if (length(all_types) == 1) { stop("We need more than one types")} 
+  if (is.null(agent_table)) {
+    # Initial generation
+    if (method == "uniform"){
+      type  <-  sample(all_types,
+                       size=num_agents,
+                       replace = TRUE
+                       )   
+    }        
+  }
+  else {
+    if (method == "uniform") {
+      agent_table_size  <- dim(agent_table)
+      agents_no_mutation  <- sample(x = agent_table[,"type"], 
+                                    size = num_agents, # Here we gave a little flexibility to changing population size
+                                    prob = agent_table[,"payoff"]/sum(agent_table[,"payoff"]),
+                                    replace = TRUE
+                                    )
+      agents_all_mutation  <- sample(all_types, size = num_agents, replace = TRUE)
+      type  <- mutate_from_vector(agents_no_mutation, agents_all_mutation, mutation_prob)
+    }
+  }
+  agent_no  <- 1:num_agents 
+  payoff  <- rep(0, times=num_agents)
+  return(cbind(agent_no, type, payoff)) 
+}
+
 
 create_matching<-function(num_agents, method = "random") {
-    if(method == "random"){
-      agents_shuffled  <- sample(1:num_agents)
-      matching_matrix  <- cbind(agents_shuffled[1:(num_agents/2)],agents_shuffled[((num_agents/2)+1):num_agents])
-    }
-return(matching_matrix)
+  if(method == "random"){
+    agents_shuffled  <- sample(1:num_agents)
+    matching_matrix  <- cbind(agents_shuffled[1:(num_agents/2)],agents_shuffled[((num_agents/2)+1):num_agents])
+  }
+  return(matching_matrix)
 }
 
 
@@ -199,4 +200,4 @@ get_type_strategy  <- function(typeno) {
   strategy  <- possible_types[as.character(typeno),]
   names(strategy)  <- NULL
   return(strategy)
-    }
+}
