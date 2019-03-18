@@ -15,7 +15,7 @@ source('./functions.R')
 types  <- get_type_names()
 actions  <- get_actions()
 num_types  <- length(types)
-
+num_actions  <- length(actions)
 
 initiate_output_files()
 

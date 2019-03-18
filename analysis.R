@@ -9,8 +9,8 @@ source("./functions.R")
 #df_actions  <- read_csv("./output/db_actions.csv")
 #df_types  <- read_csv("./output/db_types.csv")
 
-df_actions  <- read_csv("./output/db_actions-2019-03-17.csv")
-df_types  <- read_csv("./output/db_types-2019-03-17.csv")
+df_actions  <- read_csv("./output/db_actions_agg.csv")
+df_types  <- read_csv("./output/db_types_agg.csv")
 
 glimpse(df_actions)
 glimpse(df_types)
@@ -25,7 +25,10 @@ df_actions_agg  <- df_actions  %>% filter(simulation == 1)  %>% group_by(delta, 
   summarize(proportion = mean(proportion))
 
   ggplot(df_actions_agg, aes(y = proportion, x = generation, color = as.factor(action))) +
-  geom_line(size=0.5) + facet_grid(delta ~ .)
+  geom_line(size=0.5)
+
+
++ facet_grid(delta ~ .)
 
 # This is the same as above but it groups by everyting except simulation and proportion, which give the same result
 df_actions  %>% group_by_at(vars(-simulation, -proportion))  %>%
@@ -64,3 +67,18 @@ df_types_agg  %>%
     group_by(type)  %>%
     summarize(mean_prop = mean(proportion))  %>%
     arrange(desc(mean_prop))
+
+
+
+
+### Already aggregated
+df_actions_agg  <- read_csv("./output/db_actions_agg.csv")
+df_types_agg  <- read_csv("./output/db_types_agg.csv")
+
+
+  ggplot(df_actions_agg, aes(y = proportion, x = generation, color = as.factor(action))) +
+  geom_line(size=0.5) + facet_grid(delta ~ .)
+
+ ggplot(df_types_agg, aes(y = proportion, x = generation, color = as.factor(type))) +
+  geom_line(size=0.5) + facet_grid(delta ~ .)
+

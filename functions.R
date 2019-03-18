@@ -57,7 +57,7 @@ react<-function(type, opponent_action, mistake_rate)  {
 }
 
 
-initiate_output_files  <- function() {
+initiate_output_files  <- function(types_filename, actions_filename) {
   tbl_actions_header  <- matrix(c("delta",
                                   "efficiency_rate",
                                   "mistake_rate",
@@ -71,7 +71,7 @@ initiate_output_files  <- function() {
                                ,nrow = 1)
 
 
-  write.table(tbl_actions_header, "./output/db_actions.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+  write.table(tbl_actions_header, actions_filename, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
 
   tbl_types_header  <- matrix(c("delta",
                                 "efficiency_rate",
@@ -86,11 +86,62 @@ initiate_output_files  <- function() {
                              ,nrow = 1)
 
 
-  write.table(tbl_types_header, "./output/db_types.csv", row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+  write.table(tbl_types_header, types_filename, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
 
   message("initiated output files")
 
 }
+
+
+initiate_output_files_agg  <- function(types_filename, actions_filename) {
+  tbl_actions_header  <- matrix(c("delta",
+                                  "efficiency_rate",
+                                  "mistake_rate",
+                                  "mutation_rate",
+                                  "num_agents",
+                                  #"simulation",
+                                  "generation",
+                                  "action",
+                                  "proportion"
+                                  )
+                               ,nrow = 1)
+
+
+  write.table(tbl_actions_header, actions_filename, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+
+  tbl_types_header  <- matrix(c("delta",
+                                "efficiency_rate",
+                                "mistake_rate",
+                                "mutation_rate",
+                                "num_agents",
+                                #"simulation",
+                                "generation",
+                                "type",
+                                "proportion"
+                                )
+                             ,nrow = 1)
+
+
+  write.table(tbl_types_header, types_filename, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+
+  message("initiated output files,", types_filename, actions_filename)
+
+}
+
+
+write_to_file  <- function(file_name, delta, efficiency_rate, mistake_rate, mutation_rate, num_agents, category_vector, proportion_list) {
+  num_list_entries  <- length(proportion_list)
+
+  # Stripping names to avoid them to be written in the db
+
+for (entry in 1:num_list_entries) {
+#  names(proportion_list[[entry]])  <- NULL
+table_to_write  <- data.frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, generation = entry, category  = category_vector, prop = as.vector(proportion_list[[entry]]))
+
+write.table(table_to_write, file = file_name, append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
+}
+}
+
 
 
 # ==== ==== ====

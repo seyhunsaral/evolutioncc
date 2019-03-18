@@ -15,48 +15,53 @@ source('./functions.R')
 types  <- get_type_names()
 actions  <- get_actions()
 num_types  <- length(types)
+num_actions  <- length(actions)
+delta_range  <- c(0.8)
+output_types = "./output/db_types_agg.csv"
+output_actions = "./output/db_actions_agg.csv"
 
-
-initiate_output_files()
+initiate_output_files_agg(types_filename = output_types, actions_filename = output_actions)
 
 # number of agents should be even
 num_agents  <- 200
 mistake_rate  <- 0.005
 mutation_rate  <- 0.01
-num_generations  <- 5000
-num_simulations  <- 300
+num_generations  <- 15000 
+num_simulations  <- 10
 efficiency_rate  <- 3
 
+#delta_range  <- c(0.25, 0.33, 0.50, 0.66, 0.75, 0.85, 0.90, 0.95)
 
-
-delta_range  <- c(0.25, 0.33, 0.50, 0.66, 0.75, 0.85, 0.90, 0.95)
-
-
-
+simulation_weight  <- 1 / num_simulations
+# These are for warnings etc. 
 message_percent  <- 25
 message_steps  <- num_generations * message_percent / 100
 
+
+# Inititate data files
+
+
 for (delta in delta_range ) {
+message("delta:", delta, " in range ", delta_range)
+   # Data files for simulation
+  aggregated_actions  <- replicate(num_generations, rep(0, num_actions), simplify = FALSE)  
+  aggregated_types  <- replicate(num_generations, rep(0, num_types), simplify = FALSE)  
 
+
+  
   for (simulation in 1:num_simulations) {
+    message("simulation:", simulation, " out of ", num_simulations, "  Time ",Sys.time())
 
- 
-
+#    message(simulation)
     agents = NULL # NULL indicates the generation function that it is the first generation
-
 
     for (generation in 1:num_generations) {
  
-      
       agents  <- generate_agents(num_agents = num_agents, all_types = types, agent_table = agents, mutation_prob = mutation_rate)
       matchings  <- create_matching(num_agents)
       num_matchings  <- dim(matchings)[1]
   
-      action_prop_generation <- rep(0,num_actions)
-      
-
-
-      
+      actions_prop_generation <- rep(0,num_actions)
       
       for (current_matching_line in 1:num_matchings) {
         current_matching <-matchings[current_matching_line,]
@@ -106,33 +111,55 @@ for (delta in delta_range ) {
         }
 
         # Action frequencies stands for each 
-        action_prop_generation  <- action_prop_generation + action_frequencies/(num_interactions * num_matchings)
+        actions_prop_generation  <- actions_prop_generation + action_frequencies/(num_interactions * num_matchings)
       }
  
 
 
       # Writing to data
-      types_prop_generation <- table(factor(agents[,"type"], levels= types))
-
-    #  tbl_types_current_gen  <- data.frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, simulation = simulation, generation = generation, type = names(types_prop_generation), prop = as.numeric(types_prop_generation)/num_agents)
-
-   #   write.table(tbl_types_current_gen, "./output/db_types.csv", append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
-
-
-
-   #   tbl_actions_current_gen  <- data.frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, simulation = simulation, generation = generation, action = actions, prop = action_prop_generation)
-
-  #  write.table(tbl_actions_current_gen, "./output/db_actions.csv", append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
-
-
-
       
+      types_prop_generation <- table(factor(agents[,"type"], levels= types)) / num_agents
+
+
+      # Adding to aggregated
+      aggregated_actions[[generation]]  <- aggregated_actions[[generation]] + actions_prop_generation * simulation_weight
+      aggregated_types[[generation]]  <- aggregated_types[[generation]] + types_prop_generation * simulation_weight
+
+    
     }
   }
+
+
+
+
+write_to_file(file_name = output_actions,
+              delta = delta,
+              efficiency_rate = efficiency_rate,
+              mistake_rate = mistake_rate,
+              mutation_rate = mutation_rate,
+              num_agents = num_agents,
+              category_vector = actions,
+              proportion_list = aggregated_actions
+              )
+
+write_to_file(file_name = output_types,
+              delta = delta,
+              efficiency_rate = efficiency_rate,
+              mistake_rate = mistake_rate,
+              mutation_rate = mutation_rate,
+              num_agents = num_agents,
+              category_vector = types,
+              proportion_list = aggregated_types
+              )
+
+
+
+
+
 }
 message('done!')
 
 
 # TODO: Create two empty lists with number of generations: one for actions, one for types
-# TODO: Weight action_prop_generation and types_prop_generation according to the number of simulations
+# TODO: Weight actions_prop_generation and types_prop_generation according to the number of simulations
 # TODO: Add to the current list
