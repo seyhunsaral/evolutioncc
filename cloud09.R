@@ -21,8 +21,8 @@ delta_range  <- c(0.9)
 #output_actions = "./output/db_actions_agg_delta08.csv"
 
 
-output_types  <- paste0(output_types,".",delta)
-output_actions  <- paste0(output_actions,".",delta)
+output_types  <- paste0(output_types,".",delta_range)
+output_actions  <- paste0(output_actions,".",delta_range)
 
 
 initiate_output_files_agg(types_filename = output_types, actions_filename = output_actions)

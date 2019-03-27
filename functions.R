@@ -129,14 +129,14 @@ initiate_output_files_agg  <- function(types_filename, actions_filename) {
 }
 
 
-write_to_file  <- function(file_name, delta, efficiency_rate, mistake_rate, mutation_rate, num_agents, category_vector, proportion_list) {
+write_to_file  <- function(file_name, delta, efficiency_rate, mistake_rate, mutation_rate, num_agents, class_vector, proportion_list) {
   num_list_entries  <- length(proportion_list)
 
   # Stripping names to avoid them to be written in the db
 
 for (entry in 1:num_list_entries) {
 #  names(proportion_list[[entry]])  <- NULL
-table_to_write  <- data.frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, generation = entry, category  = category_vector, prop = as.vector(proportion_list[[entry]]))
+table_to_write  <- data.frame(delta = delta, efficiency_rate = efficiency_rate, mistake_rate = mistake_rate, mutation_rate = mutation_rate, num_agents = num_agents, generation = entry, class  = class_vector, prop = as.vector(proportion_list[[entry]]))
 
 write.table(table_to_write, file = file_name, append = TRUE, row.names = FALSE, na = "NA", sep=",", col.names = FALSE) 
 }
@@ -244,7 +244,7 @@ create_matching<-function(num_agents, method = "random") {
 
 
 # -----------------------------------------------------------------------------------------
-#                             Graphics Functions
+#                             Analysis Functions
 # -----------------------------------------------------------------------------------------
 
 get_type_strategy  <- function(typeno) {
@@ -252,3 +252,181 @@ get_type_strategy  <- function(typeno) {
   names(strategy)  <- NULL
   return(strategy)
 }
+
+bind_multiple_files  <- function(output_folder, pattern) {
+
+file_list  <- list.files(output_folder, pattern = pattern)
+  
+filepath_list <- paste0(output_folder,file_list)
+message("gathered following files:")
+cat(file_list, sep="\n")
+return(suppressMessages(bind_rows(lapply(filepath_list,read_csv))))
+  }
+
+
+
+  
+#==================NAMING FUNCTIONS==================================
+
+
+# this part is not generalized as naming is specific to three actions
+possible_actions_letter<-as.vector(c("L","M","H"))
+#Input: Reaction Functions as column vector ex: c(0,1,2,2) 
+#Output: nametypev: L17, initial action and 13 base-3 type
+#        nametypef: LMHH initial action,response to L,M,H respectively
+
+#nametypev<-function(typev) paste(possible_actions_letter[typev[1]+1],typev[4]+typev[3]*3+typev[2]*9,sep = "")
+name_from_vector <- function(type_vector) paste(possible_actions_letter[type_vector[1]+1],"-",possible_actions_letter[type_vector[2]+1],possible_actions_letter[type_vector[3]+1],possible_actions_letter[type_vector[4]+1],sep = "")
+
+name_from_type  <- function(type_number) {
+name_from_vector(as.vector(possible_types[as.character(type_number),]))
+  }
+
+
+name_labeler  <- function(type_list) {
+return(sapply(type_list,name_from_type))
+  }
+
+get_action_labels  <- function(){
+return(c(`0` = "L", `1` = "M", `2` = "H"))
+  }
+#===================================================================
+
+
+
+
+
+# ======================= Type labeler ==========================
+class_vector  <- c("selfish",#1
+                 "conditional",#2
+                 "conditional",#3
+                 "humped",#4
+                 "conditional",#5
+                 "perf-conditional",#6
+                 "humped",#7
+                 "humped",#8
+                 "conditional",#9
+                 "other",#10
+                 "other",#11
+                 "other",#12
+                 "other",#13
+                 "unconditional",#14
+                 "conditional",#15
+                 "humped",#16
+                 "humped",#17
+                 "conditional",#18
+                 "other",#19
+                 "other",#20
+                 "other",#21
+                 "other",#22
+                 "other",#23
+                 "other",#24
+                 "other",#25
+                 "unconditional",#26
+                 "unconditional",#27
+                 "selfish",#28
+                 "conditional",#29
+                 "conditional",#30
+                 "humped",#31
+                 "conditional",#32
+                 "perf-conditional",#33
+                 "humped",#34
+                 "humped",#35
+                 "conditional",#36
+                 "other",#37
+                 "other",#38
+                 "other",#39
+                 "other",#40
+                 "unconditional",#41
+                 "conditional",#42
+                 "humped",#43
+                 "humped",#44
+                 "conditional",#45
+                 "other",#46
+                 "other",#47
+                 "other",#48
+                 "other",#49
+                 "other",#50
+                 "other",#51
+                 "other",#52
+                 "unconditional",#53
+                 "unconditional",#54
+                 "selfish",#55
+                 "conditional",#56
+                 "conditional",#57
+                 "humped",#58
+                 "conditional",#59
+                 "perf-conditional",#60
+                 "humped",#61
+                 "humped",#62
+                 "conditional",#63
+                 "other",#64
+                 "other",#65
+                 "other",#66
+                 "other",#67
+                 "unconditional",#68
+                 "conditional",#69
+                 "humped",#70
+                 "humped",#71
+                 "conditional",#72
+                 "other",#73
+                 "other",#74
+                 "other",#75
+                 "other",#76
+                 "other",#77
+                 "other",#78
+                 "other",#79
+                 "unconditional",#80
+                 "unconditional"#81
+                )
+
+
+
+class_from_type  <- function(type_number) {
+  if (type_number == -999) {return("other")}
+    return(class_vector[[type_number+1]])
+  }
+
+get_class  <- function(type_list) {
+    return(sapply(type_list,class_from_type))
+  }
+
+
+  pal_red<-"#C0392B"
+  pal_blue<-"#2980B9"
+  pal_dblue<-"#1e6391"
+  pal_purple<-"#9B59B6"
+  pal_green<-"#27AE60"
+  pal_dgreen<-"#085b2b"
+  pal_yellow<-"#F1C40F"
+  pal_orange<-"#E67E22"
+  pal_pink <- "#ef39a3"
+  pal_gray  <- "#888888"
+
+
+
+
+color_vector  <- c("conditional"= pal_green,
+                             "selfish" = pal_red,
+                             "perf-conditional" = pal_dgreen,
+                             "other" = pal_gray,
+                                                "unconditional" = pal_orange,
+
+                             "humped"=  pal_yellow)
+
+get_color_vector  <- function(){return(color_vector)}
+
+get_color_type_vector  <- function(){
+  return(as.vector(colorize_class(get_class(0:80))))}
+
+color_from_class  <- function(classname) {
+ return(color_vector[classname])   
+  }
+
+colorize_class  <- function(class_list){
+    return(sapply(class_list,color_from_class))
+}
+
+facet_labeller_delta  <- function(input) {
+return(as.list(paste("delta:", input)))
+  }
