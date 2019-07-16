@@ -3,7 +3,7 @@
 
 This is the repository for the simulations included in the study "the Evolution of Conditional Cooperation" which is a part of my PhD thesis at the University of Trento.
 
-This is an early-version. The current form of the repository is not meant to be the final public version. i.e. The files lack proper comments, the code is not concise as it should be. But those are on my schedule and if you prefer such version, you should visit the repo later. 
+*Disclaimer*: This is an early-version. The current form of the repository is not meant to be the final public version. i.e. The files lack proper comments, the code is not concise as it should be. But those are on my schedule and if you prefer such version, you should visit the repo later. 
 
 However my result are reproducible with those files. 
 
@@ -17,9 +17,9 @@ Due to the heavy load of the first one, those two are separated.
 
 
 ## Simulation
-
-### Files generated in the `./output` folder
-* main_aggregated.R: This file for given parameters creates two files in the output: 
+* `main_aggregated.R`: This file runs the whole simulation and it is the main file of the study (the one I used for the paper). The results for different simulations in each generation is averaged.
+* `main.R`: This is an early version which saves the data for each Monte Carlo simulation in a different line. It is perfect for investigating individual cases but the output file are much bigger. 
+### Files generated for the simulation (in the `./output` folder)
     * `db_types_agg.csv`: The file keeps conditional agent types (0 to 81) and their average relative frequency for each generation 
     * `db_actions_agg.csv`: The file keeps actions and their average relative frequencies for each generation. 
     
@@ -33,4 +33,7 @@ Due to the heavy load of the first one, those two are separated.
 * `num_generations`: Total number of generations. 
 * `efficiency_rate`: Efficiency rate(b/c) of the social dilemma (Extended prisoners' dilemma game)
 
+
+## Analysis 
+`analysis.R`: It produces the tables and the images that are used in the paper. 
 
