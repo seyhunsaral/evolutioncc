@@ -20,8 +20,8 @@ Due to the heavy load of the first one, those two are separated.
 * `main_aggregated.R`: This file runs the whole simulation and it is the main file of the study (the one I used for the paper). The results for different simulations in each generation is averaged.
 * `main.R`: This is an early version which saves the data for each Monte Carlo simulation in a different line. It is perfect for investigating individual cases but the output file are much bigger. 
 ### Files generated for the simulation (in the `./output` folder)
-    * `db_types_agg.csv`: The file keeps conditional agent types (0 to 81) and their average relative frequency for each generation 
-    * `db_actions_agg.csv`: The file keeps actions and their average relative frequencies for each generation. 
+* `db_types_agg.csv`: The file keeps conditional agent types (0 to 81) and their average relative frequency for each generation 
+* `db_actions_agg.csv`: The file keeps actions and their average relative frequencies for each generation. 
     
     Note: It takes so much time and processing power to run those simulations and it creates two big files (In order to replicate the current version of the paper, it needs around 3GB's of space). If you'd like to just to try the files, you can reduce the number of generations (`num_generations`) to a small number and check the output.
     
