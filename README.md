@@ -13,6 +13,9 @@ There are two parts:
 
 Due to the heavy load of the first one, those two are separated. 
 
+![Conditional types on a single instance](./types.jpg)
+
+
 ## Simulation
 
 ### Files generated in the `./output` folder
