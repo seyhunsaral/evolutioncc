@@ -430,3 +430,8 @@ colorize_class  <- function(class_list){
 facet_labeller_delta  <- function(input) {
 return(as.list(paste("delta:", input)))
   }
+
+
+facet_labeller_mistake_rate  <- function(input) {
+return(as.list(paste("mistake rate:", input)))
+  }

@@ -36,9 +36,11 @@ df_actions  %>% filter(simulation == 3)  %>% group_by(delta, efficiency_rate, mi
   ylab("Fraction of Action") +
   xlab("Generation") +
   theme_bw() +
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") -> plot_actions_singlerun
   
 ggsave("./images/actions_singlerun.pdf")
+
+ggsave("./images/actions_singlerun2.jpg", plot = plot_actions_singlerun, height=5, width=8, units="in", dpi=300)
 
 
 
@@ -62,14 +64,13 @@ ggplot(aes(y = proportion, x = generation, color = class)) +
   theme_bw() +
   xlab("Generation") +
   ylab("Fraction in population") +
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") ->  plot_types_singlerun
 
 ggsave("./images/types_singlerun.pdf")
 
+ggsave("./images/types_singlerun2.jpg", plot = plot_types_singlerun, height=5, width=8, units="in", dpi=300)
 
 
-
-+
 # scale_x_discrete(labels = name_labeler) +
  # scale_fill_manual(values  = c("red","blue","green","pink")) +
   scale_color_manual(values  = get_color_vector()) +
@@ -150,8 +151,18 @@ db_actions_agg_data%>%
   geom_line(size=0.5) + facet_wrap(~ delta, labeller = labeller(delta=facet_labeller_delta)) +
   scale_color_discrete(labels = get_action_labels() )
 
+# mistake comparision
+db_types_agg_data  %>%
+  filter(delta == 0.95)  %>% 
+  ggplot(aes(y= proportion, x = generation, color = as.factor(type))) +
+  geom_line(size = 0.5, aes(linetype = as.factor(mistake_rate))) +
+  facet_grid(delta ~ .)
 
-
+db_actions_agg_data  %>%
+  filter(delta >= 0.5)  %>% 
+  ggplot(aes(y= proportion, x = generation, color = as.factor(action))) +
+  geom_line(size = 0.5, aes(linetype = as.factor(mistake_rate))) +
+  facet_wrap(delta ~ .) 
 
 
 
@@ -161,7 +172,7 @@ db_types_agg_data%>%
         filter (delta == 0.95)  %>% 
     ggplot(aes(y = proportion, x = generation, color = as.factor(type))) +
   geom_line(size=0.5) +
-  facet_grid(delta ~ mistake_rate)
+  facet_grid(delta ~ mistake_rate) -> testgraph
 
 db_types_agg_data %>% filter(generation == 5000 & delta == 0.95) %>%  select(type, proportion) %>% arrange(desc(proportion))
 
@@ -177,15 +188,18 @@ db_types_agg_data  %>% filter(generation == 5000)  %>%
 
 # Actions evolution
 # Plot 3 - Actions over delta
-db_actions_agg_data  %>% filter(generation == 5000)  %>% filter(delta >= 0.5)  %>%  filter(mistake_rate == 0.005)  %>% 
+db_actions_agg_data  %>% filter(generation == 5000)  %>% filter(delta >= 0.5)  %>%
+  filter(mistake_rate == 0.005)  %>% 
   ggplot(aes(y = proportion, x = delta, color = as.factor((action)))) +
   geom_line()   +
+  geom_point() +
   scale_x_continuous(breaks = seq(0.5,1,0.05)) +
   scale_color_manual("Action", values = c("red","turquoise2","blue"),labels = get_action_labels() )+
   ylab("Average fraction") +
   xlab("Continuation probability (delta)") +
   theme_bw() +
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") +
+  theme(panel.grid.minor = element_blank())
 
 ggsave("./images/actions_over_delta.pdf")
 
@@ -214,23 +228,100 @@ db_types_agg_data  %>% filter(generation >= 3000)  %>%  filter(mistake_rate == 0
 
 db_types_agg_data_averaged_with_mistakes  %>%  group_by(type, delta)  %>%
   summarise(mean_prop = mean(proportion))  %>%
-  filter(mean_prop > 0.1)  %>% select(type)  %>%
+  filter(mean_prop > 0.01)  %>%
+  select(type)  %>%
   unique() -> successful_types_with_mistakes
 
+
+# Plot 3 - Types Over Delta
 db_types_agg_data_averaged_with_mistakes   %>%  filter( type %in% successful_types_with_mistakes$type)  %>% mutate(class = get_class(type))  %>%
   ggplot(aes(y = proportion, x = as.factor(type), fill = class)) +
   geom_bar(stat = "identity") +
   scale_x_discrete(labels = name_labeler) +
  # scale_fill_manual(values  = c("red","blue","green","pink")) +
   scale_fill_manual(values  = get_color_vector()) +
-  facet_wrap(delta ~ ., labeller = labeller(delta=facet_labeller_delta)) +
+  facet_wrap(delta ~ ., labeller = labeller(delta=facet_labeller_delta), ncol = 3) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("") +
-  ylab("Average fraction")
+  ylab("Average fraction") +
+  theme(legend.position="bottom")
 
-ggsave("./images/types_average.pdf")
+
+ggsave("./images/types_average_t05.pdf")
 
 db_types_agg_data_averaged_with_mistakes  %>% 
   ggplot(aes(y = proportion, x = delta, color = as.factor((type)))) +
-  geom_line()
+  geom_line() +
+  scale_color_discrete("Types",labels = name_labeler)
+
+
+
+
+# Mistakestuff
+
+# Actions evolution
+# Plot 3 - Actions over delta
+db_actions_agg_data  %>% filter(generation == 5000)  %>% filter(delta >= 0.5)  %>%
+  #filter(mistake_rate == 0.005)  %>% 
+  ggplot(aes(y = proportion, x = delta, color = as.factor((action)))) +
+  geom_line(aes(linetype = as.factor(mistake_rate)))   +
+  geom_point() +
+  scale_x_continuous(breaks = seq(0.5,1,0.05)) +
+  scale_color_manual("Action", values = c("red","turquoise2","blue"),labels = get_action_labels() )+
+  ylab("Average fraction") +
+  xlab("Continuation probability (delta)") +
+  theme_bw() +
+  theme(legend.position="bottom") +
+  theme(panel.grid.minor = element_blank())+
+  scale_linetype_discrete("Mistake rate")
+
+
+ggsave("./images/actions_over_delta_with_mistakes.pdf")
+
+
+## # this is the picture where x is delta and y is average fraction
+## # it looks quite messy though. i will use another one below
+## db_types_agg_data  %>% filter(generation == 5000)  %>% filter(delta >= 0.5)  %>%
+##   #filter(mistake_rate == 0.005)  %>% 
+##   ggplot(aes(y = proportion, x = delta, color = as.factor((type)))) +
+##   geom_line(aes(linetype = as.factor(mistake_rate)))   +
+##   geom_point() +
+##   scale_x_continuous(breaks = seq(0.5,1,0.05)) +
+##   ylab("Average fraction") +
+##   xlab("Continuation probability (delta)") +
+##   theme_bw() +
+##   theme(legend.position="bottom") +
+##   theme(panel.grid.minor = element_blank())+
+##   scale_linetype_discrete("Mistake rate")
+
+
+## Experimenting with mistake representation
+# Below analysis averages last 1000 generations to reduce instant changes
+db_types_agg_data  %>% filter(generation >= 3000)  %>%  #filter(mistake_rate == 0.005)  %>%
+  filter( delta >= 0.5 )  %>% group_by_at(vars(-proportion,-generation))  %>% summarise(proportion = mean(proportion)) -> db_types_agg_data_averaged_both
+
+db_types_agg_data_averaged_both  %>%  group_by(type, delta, mistake_rate)  %>%
+  summarise(mean_prop = mean(proportion))  %>%
+  filter(mean_prop > 0.05)  %>%
+  ungroup() %>% 
+  select(type)  %>%
+  unique() -> successful_types_both
+
+
+# Plot 3 - Types Over Delta mistake comparision
+db_types_agg_data_averaged_both   %>%  filter( type %in% successful_types_both$type)  %>% mutate(class = get_class(type))  %>%
+  filter(delta %in% c(0.5,0.7,0.9)) %>% 
+  ggplot(aes(y = proportion, x = as.factor(type), fill = class)) +
+  geom_bar(stat = "identity") +
+  scale_x_discrete(labels = name_labeler) +
+ # scale_fill_manual(values  = c("red","blue","green","pink")) +
+  scale_fill_manual(values  = get_color_vector()) +
+  facet_wrap(delta ~ mistake_rate , labeller = labeller(delta=facet_labeller_delta, mistake_rate = facet_labeller_mistake_rate), ncol = 2) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("") +
+  ylab("Average fraction") +
+  theme(legend.position="bottom")
+ggsave("./images/types_average_mistake_comparision.pdf")
+
