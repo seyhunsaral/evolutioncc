@@ -4,13 +4,9 @@ This is the repository for the simulations included in the study "the Evolution 
 
 It contains `R` files to generate the data, plots and the tables that are used in the working paper. The paper is not available publicly (due to the requirements of the journal I am submitting the paper to) but you can send me an e-mail and I will be happy to share it.
 
-*Disclaimer*: This is a preliminary version. The current form of the repository is not meant to be the final public version. i.e. The files lack proper comments, the code is not concise as it should be. But those are on my schedule and if you prefer such version, you should visit the repo later. 
-
-However my result are reproducible with those files. 
-
 There are two parts: 
 * Simulation of the data
-* Analyzing the data and producing graphs
+* Analysis of the data and producing graphs
 
 Due to the heavy load of the first one, those two are separated. 
 
