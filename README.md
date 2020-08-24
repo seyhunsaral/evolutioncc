@@ -1,21 +1,21 @@
 # Evolution of Conditional Cooperation in Prisoner's Dilemma - A.S.Saral
 
-This is the repository for the simulations included in the study "the Evolution of Conditional Cooperation" which is a part of my PhD thesis at the University of Trento.
+This is the repository for the simulations included in the study "The Evolution of Conditional Cooperation in Prisoner's Dilemma" which is a part of my PhD thesis atthe University of Trento. The preprint is available her: https://osf.io/wcpkz
 
-It contains `R` files to generate the data, plots and the tables that are used in the working paper. The paper is not available publicly (due to the requirements of the journal I am submitting the paper to) but you can send me an e-mail and I will be happy to share it.
+The repository `R` files to generate the data, plots and the tables that are used in my preprint
 
 There are two parts: 
 * Simulation of the data
 * Analysis of the data and producing graphs
 
-Due to the heavy load of the first one, those two are separated. 
+Due to the heavy computational load of the first one, those two are separated. 
 
 ![Conditional types on a single instance](./types.jpg)
 
 
 ## Simulation
 * `main_aggregated.R`: This file runs the whole simulation and it is the main file of the study (the one I used for the paper). The results for different simulations in each generation is averaged.
-* `main.R`: This is an early version which saves the data for each Monte Carlo simulation in a different line. It is perfect for investigating individual cases but the output file are much bigger. 
+* `main.R`: This is an early version which saves the data for each Monte Carlo simulation in a different line. It is perfect for investigating individual cases but the output files are much bigger. 
 ### Files generated for the simulation (in the `./output` folder)
 * `db_types_agg.csv`: The file keeps conditional agent types (0 to 81) and their average relative frequency for each generation 
 * `db_actions_agg.csv`: The file keeps actions and their average relative frequencies for each generation. 
