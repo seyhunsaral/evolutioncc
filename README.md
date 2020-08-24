@@ -1,4 +1,4 @@
-# Evolution of Conditional Strategies - A.S.Saral
+# Evolution of Conditional Cooperation in Prisoner's Dilemma - A.S.Saral
 
 This is the repository for the simulations included in the study "the Evolution of Conditional Cooperation" which is a part of my PhD thesis at the University of Trento.
 
