@@ -1,6 +1,6 @@
 # Evolution of Conditional Cooperation in Prisoner's Dilemma - A.S.Saral
 
-This is the repository for the simulations included in the study "The Evolution of Conditional Cooperation in Prisoner's Dilemma" which is a part of my PhD thesis atthe University of Trento. The preprint is available her: https://osf.io/wcpkz
+This is the repository for the simulations included in the study "The Evolution of Conditional Cooperation in Prisoner's Dilemma" which is a part of my PhD thesis atthe University of Trento. The preprint is available here: https://osf.io/wcpkz
 
 The repository `R` files to generate the data, plots and the tables that are used in my preprint
 
